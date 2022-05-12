@@ -191,6 +191,35 @@ func TestLowerCase(t *testing.T) {
 	}
 }
 
+func TestNormalize(t *testing.T) {
+	var tests = []struct {
+		param    string
+		expected string
+	}{
+		{"www.example.com", "http://example.com"},
+		{"example.com", "http://example.com"},
+		{"HTTP://example.com", "http://example.com"},
+		{"//example.com", "http://example.com"},
+		{"http://example.com", "http://example.com"},
+		{"http://example.com:80", "http://example.com"},
+		{"https://example.com:443", "https://example.com"},
+		{"ftp://example.com:21", "ftp://example.com"},
+		{"http://www.example.com", "http://example.com"},
+		{"www.example.com", "http://example.com"},
+		{"http://example.com/foo/", "http://example.com/foo"},
+		// {"http://xn--xample-hva.com", "http://êxample.com"},
+		{"example.com/?foo=bar%20baz", "http://example.com/?foo=bar baz"},
+		// {"http://example.com/?", "http://example.com"},
+		{"http://example.com/?b=bar&a=foo", "http://example.com/?a=foo&b=bar"},
+	}
+	for _, test := range tests {
+		actual, _ := Normalize(test.param)
+		if actual != test.expected {
+			t.Errorf("Expected Normalize(%q) to be %v, got %v", test.param, test.expected, actual)
+		}
+	}
+}
+
 func TestStripTrailingSlash(t *testing.T) {
 	var tests = []struct {
 		param    string

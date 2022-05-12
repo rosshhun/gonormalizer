@@ -31,3 +31,9 @@ var (
 	rxPort   *regexp.Regexp = regexp.MustCompile(URLPort)
 	rxColon  *regexp.Regexp = regexp.MustCompile(COLON_REGEXP)
 )
+
+var defaultPorts = map[string]int{
+	"http":  80,
+	"https": 443,
+	"ftp":   21,
+}

@@ -82,6 +82,7 @@ func ForceHttps(u string) (string, error)
 func IsEmpty(u string) bool
 func IsValid(u string) bool
 func LowerCase(u string) string
+func Normalize(s string) (string, error)
 func RemoveTrailingDot(u string) (string, error)
 func RemoveTrailingSlash(u string) (string, error)
 func Scheme(u string) (string, error)
@@ -291,6 +292,27 @@ import (
 
 func main() {
 	u := gonormalizer.LowerCase("HtTPs://example.com")
+	fmt.Println(u)
+}
+
+```
+
+#### Normalize
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.Normalize("//example.com")
+	if err != nil{
+		fmt.Println(err)
+	}
 	fmt.Println(u)
 }
 

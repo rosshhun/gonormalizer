@@ -2,8 +2,11 @@ package gonormalizer
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"strings"
+
+	"golang.org/x/net/idna"
 )
 
 // AddPort attaches the specified port to the end of URL
@@ -161,6 +164,49 @@ func IsEmpty(u string) bool {
 // it returns the lowercase string
 func LowerCase(u string) string {
 	return strings.ToLower(u)
+}
+
+// Normalize is a generalized method for normalizing URL
+// Accepts URL as a string argument
+// Returns the normalized string and nil
+// In case of error return is a unambiguous string with a customized error
+func Normalize(s string) (string, error) {
+	s = strings.TrimSpace(s)
+	b := IsEmpty(s)
+	if b {
+		return s, errors.New("URL is Empty")
+	}
+	if strings.HasPrefix(s, "//") {
+		s = "http:" + s
+	}
+	u, err := url.Parse(s)
+	if err != nil {
+		return s, err
+	}
+	if u.Scheme == "" {
+		// Ugh...
+		u, err = url.Parse("http://" + s)
+		if err != nil {
+			return s, err
+		}
+	}
+	p, ok := defaultPorts[u.Scheme]
+	if ok {
+		u.Host = strings.TrimSuffix(u.Host, fmt.Sprintf(":%d", p))
+	}
+	punyToText, err := idna.ToUnicode(u.Host)
+	if err != nil {
+		return punyToText, err
+	} else {
+		u.Host = punyToText
+	}
+	u.Host = strings.TrimPrefix(u.Host, "www.")
+	v := u.Query()
+	u.RawQuery = v.Encode()
+	u.RawQuery, _ = url.QueryUnescape(u.RawQuery)
+	n := u.String()
+	n = strings.TrimSuffix(n, "/")
+	return n, nil
 }
 
 // StripTrailingSlash removes TrailingSlash / from the end of URL
