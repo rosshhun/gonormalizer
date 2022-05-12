@@ -93,3 +93,430 @@ func StripTextFragment(u string) (string, error)
 func StripWWW(u string) (string, error)
 func TrimURL(u string) string
 ```
+
+## Examples
+
+
+#### AddPort
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.AddPort("http://example.com/", "80")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### AddProtocol
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.AddProtocol("example.com", "https")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### AddTrailingDot
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.AddTrailingDot("example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### AddTrailingSlash
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.AddTrailingSlash("https://example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### DefaultProtocol
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.DefaultProtocol("example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### ForceHttp
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.ForceHttp("https://example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### ForceHttps
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.ForceHttps("http://example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### IsEmpty
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u := gonormalizer.IsEmpty("https://example.com")
+	fmt.Println(u)
+}
+
+```
+
+#### IsValid
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u := gonormalizer.IsValid("https://example.com")
+	fmt.Println(u)
+}
+```
+#### LowerCase
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u := gonormalizer.LowerCase("HtTPs://example.com")
+	fmt.Println(u)
+}
+
+```
+
+#### StripTrailingDot
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripTrailingDot("https://example.com.")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### StripTrailingSlash
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripTrailingSlash("https://example.com/")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### Scheme
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.Scheme("https://example.com/")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### StripAuthentication
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripAuthentication("user:password@example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+```
+
+#### StripHash
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripHash("https://example.com#")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+```
+
+#### StripPort
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripPort("https://example.com:80")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### StripProtocol
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripProtocol("https://example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### StripTextFragment
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripTextFragment("https://example.com#*~text339-+")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### StripWWW
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u, err := gonormalizer.StripWWW("https://www.example.com")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(u)
+}
+
+```
+
+#### TrimURL
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/rosshhun/gonormalizer"
+)
+
+func main() {
+	u := gonormalizer.TrimURL("    https://www.example.com    ")
+	fmt.Println(u)
+}
+```
+
+#### Notes
+Documentation is available here: [pkg.go.dev](https://pkg.go.dev/github.com/rosshhun/gonormalizer).
+
+#### Support
+If you do have a contribution to the package, feel free to create a Pull Request or an Issue.
+
+#### What to contribute
+If you don't know what to do, there are some features and functions that need to be done
+
+- [ ]  Refactor code
+- [ ]  Edit docs and [README](https://github.com/rosshhun/gonormalizer/README.md): spellcheck, grammar and typo check
+- [ ]  Implement benchmarking
+- [ ]  Implement batch of examples
+- [ ]  Look at forks for new features and fixes
+
+#### Advice
+Feel free to create what you want, but keep in mind when you implement new features:
+- Code must be clear and readable, names of variables/constants clearly describes what they are doing
+- Public functions must be documented and described in source file and added to README.md to the list of available functions
+- There are must be unit-tests for any new functions and improvements
