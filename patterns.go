@@ -10,7 +10,7 @@ const (
 	WWW_REGEXP     = `(www\.)`
 	FHTTP_REGEXP   = `^(?:https:)`
 	FHTTPS_REGEXP  = `^(?:http:)`
-	SHASH_REGEXP   = `(#.+)`
+	SHASH_REGEXP   = `(#.*)`
 	SAUTH_REGEXP   = `^((?:\w+:)?\/\/)?[^@/]+@`
 	TAIL_REGEXP    = `\/$`
 	TAILDOT_REGEXP = `\.$`

@@ -20,6 +20,9 @@ func AddPort(u string, p string) (string, error) {
 	if rxSlash.Match([]byte(u)) {
 		u, _ = StripTrailingSlash(u)
 	}
+	if rxColon.Match([]byte(u)) {
+		u = u[:len(u)-1]
+	}
 	if !rxPort.Match([]byte(u)) {
 		return u + ":" + p, nil
 	}
@@ -136,6 +139,9 @@ func ForceHttps(u string) (string, error) {
 // if string matches the patterns (pattern is regular expression) then
 // returns true, else false
 func IsValid(u string) bool {
+	if IsEmpty(u) {
+		return false
+	}
 	return rxC.Match([]byte(u))
 }
 
