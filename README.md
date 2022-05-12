@@ -1,10 +1,11 @@
 # gonormalizer
 [![Go Reference](https://pkg.go.dev/badge/github.com/rosshhun/gonormalizer.svg)](https://pkg.go.dev/github.com/rosshhun/gonormalizer)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rosshhun/gonormalizer)](https://goreportcard.com/report/github.com/rosshhun/gonormalizer)
+
 A simple and easy to use URL Normalisation package for GO.
 
 **Note:** This package does not do URL sanitization or Validation. It's important and recommended to do URL validation before passing url's as function parameters, the package only deals with normalization. If you are using this package in server context it's upto you to perform validation to prevent from various attacks. More information related to normalization can be found here:
-> [Normalize](https://en.wikipedia.org/wiki/URL_normalization)
+> [Normalize](https://en.wikipedia.org/wiki/URL_normalization)\
 > [RFC3986](https://www.ietf.org/rfc/rfc3986.txt)
 
 ## Install
