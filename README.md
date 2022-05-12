@@ -14,32 +14,7 @@ A simple and easy to use URL Normalisation package for GO.
 go get github.com/rosshhun/gonormalizer
 ```
 
-## List of Functions Available
-```
-AddPort
-AddProtocol
-AddTrailingDot
-AddTrailingSlash
-DefaultProtocol
-ForceHttp
-ForceHttps
-IsEmpty
-IsValid
-LowerCase
-RemoveTrailingDot
-RemoveTrailingSlash
-Scheme
-StripAuthentication
-StripHash
-StripPort
-StripProtocol
-StripTextFragment
-StripWWW
-TrimURL
-
-```
-
-## Usage
+## Usage/Examples
 
 ```go
 import (
@@ -47,19 +22,74 @@ import (
 )
 
 func main(){
-	fmt.Prinltln(gonormalizer.ForceHttps("http://example.com/"))
+	u, err := gonormalizer.ForceHttps("http://example.com/")
+	if err != nil{
+		fmt.Prinltln(err)
+	}
+	fmt.Prinltln(u)
 	//=>https://example.com/
 }
 
 ```
 
-## API
+## Function Signatures
 
-### functionName(url) (string, error)
+### functionName(string) (string, error)
 
-#### URL Type: `string`
+#### Parameter: `string`
 Pass url as a string to function parameter, it's important to validate the url, with regex or other libraries Available.
 #### Return Type: `string`
 The value of String return type is a 'url' if there are no errors occured, if there is an error occured then the value of the string return type will be "".
-#### Error Type: `string`
+#### Return Type: `error`
 The value of Error return type is a 'nil' if there are no errors occured, if there is an error then the value of error return type  will be a custom erorr.
+
+
+### functionName(string, string) (string, error)
+
+#### Parameter1: `string`
+Pass url as a string to function parameter, it's important to validate the url, with regex or other libraries Available.
+#### Parameter2: `string`
+Pass port number or protocol as a string to function parameter, it's important to validate the url, with regex or other libraries Available.
+#### Return Type: `string`
+The value of String return type is a 'url' if there are no errors occured, if there is an error occured then the value of the string return type will be "".
+#### Return Type: `error`
+The value of Error return type is a 'nil' if there are no errors occured, if there is an error then the value of error return type  will be a custom erorr.
+
+### functionName(string) bool
+
+#### Parameter: `string`
+Pass url as a string to function parameter, it's important to validate the url, with regex or other libraries Available.
+#### Return Type: `bool`
+The value of bool return type can be a 'true/fale'
+
+### functionName(string) string
+
+#### Parameter: `string`
+Pass url as a string to function parameter, it's important to validate the url, with regex or other libraries Available.
+#### Return Type: `string`
+The value of String return type is a 'modified url'.
+
+
+## List of Functions
+```
+func AddPort(u string, p string) (string, error)
+func AddProtocol(u string, p string) (string, error)
+func AddTrailingDot(u string) (string, error)
+func AddTrailingSlash(u string) (string, error)
+func DefaultProtocol(u string) (string, error)
+func ForceHttp(u string) (string, error)
+func ForceHttps(u string) (string, error)
+func IsEmpty(u string) bool
+func IsValid(u string) bool
+func LowerCase(u string) string
+func RemoveTrailingDot(u string) (string, error)
+func RemoveTrailingSlash(u string) (string, error)
+func Scheme(u string) (string, error)
+func StripAuthentication(u string) (string, error)
+func StripHash(u string) (string, error)
+func StripPort(u string) (string, error)
+func StripProtocol(u string) (string, error)
+func StripTextFragment(u string) (string, error)
+func StripWWW(u string) (string, error)
+func TrimURL(u string) string
+```

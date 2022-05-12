@@ -1,3 +1,3 @@
-module gonormalizer
+module github.com/rosshhun/gonormalizer
 
 go 1.18
