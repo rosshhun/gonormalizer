@@ -1,83 +1,16 @@
 package gonormalizer
 
-/*
-foo://example.com:8042/over/there?name=ferret#nose
-\_/   \______________/\_________/ \_________/ \__/
- |           |            |            |        |
-scheme     authority       path        query   fragment
- |   _____________________|__
-/ \ /                        \
-urn:example:animal:ferret:nose
-*/
-
-/*
-The following four URIs are equivalent:
-  http://example.com
-  http://example.com/
-  http://example.com:/
-  http://example.com:80/
-*/
 import (
 	"errors"
 	"net/url"
-	"regexp"
 	"strings"
 )
 
-const (
-	// URL          = `^` + URLSchema + `?` + URLUsername + `?` + `((` + URLIP + `|(\[` + IP + `\])|(([a-zA-Z0-9]([a-zA-Z0-9-_]+)?[a-zA-Z0-9]([-\.][a-zA-Z0-9]+)*)|(` + URLSubdomain + `?))?(([a-zA-Z\x{00a1}-\x{ffff}0-9]+-?-?)*[a-zA-Z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-zA-Z\x{00a1}-\x{ffff}]{1,}))?))\.?` + URLPort + `?` + URLPath + `?$`
-	// HTTP_REGEXP = `^(?:https?:)?\/\/`
-	URLPort     = `(:(\d{1,5}))`
-	IP          = `(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))`
-	URL         = `^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?`
-	HTTP_REGEXP = `^(?:[a-zA-Z.-]+:)?\/\/`
-	WWW_REGEXP  = `(www\.)`
-	// GPROTO_REGEXP  = `(?:([a-zA-Z.-]+):)?\/\/`
-	FHTTP_REGEXP   = `^(?:https:)`
-	FHTTPS_REGEXP  = `^(?:http:)`
-	SHASH_REGEXP   = `(#.+)`
-	SAUTH_REGEXP   = `^((?:\w+:)?\/\/)?[^@/]+@`
-	TAIL_REGEXP    = `\/$`
-	TAILDOT_REGEXP = `\.$`
-	COLON_REGEXP   = `:$`
-)
-
-// URL complete regular expression
-var (
-	rxC *regexp.Regexp = regexp.MustCompile(URL)
-
-	// https or http
-	rxHttp *regexp.Regexp = regexp.MustCompile(HTTP_REGEXP)
-
-	// tail slash
-	rxSlash *regexp.Regexp = regexp.MustCompile(TAIL_REGEXP)
-
-	//tail dot
-	rxTd *regexp.Regexp = regexp.MustCompile(TAILDOT_REGEXP)
-
-	// www
-	rxWWW *regexp.Regexp = regexp.MustCompile(WWW_REGEXP)
-
-	// force http
-	rxFhttp *regexp.Regexp = regexp.MustCompile(FHTTP_REGEXP)
-
-	// force https
-	rxFhttps *regexp.Regexp = regexp.MustCompile(FHTTPS_REGEXP)
-
-	// strip hash
-	rxShash *regexp.Regexp = regexp.MustCompile(SHASH_REGEXP)
-
-	// strip auth
-	rxSauth *regexp.Regexp = regexp.MustCompile(SAUTH_REGEXP)
-
-	// golbal protocols
-	// rxGProto *regexp.Regexp = regexp.MustCompile(GPROTO_REGEXP)
-
-	rxPort *regexp.Regexp = regexp.MustCompile(URLPort)
-
-	rxColon *regexp.Regexp = regexp.MustCompile(COLON_REGEXP)
-)
-
+// AddPort attaches the specified port to the end of URL
+// Accepts URL and Port Number as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string with port number and nil
+// In case of error return is empty string with a customized error
 func AddPort(u string, p string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -85,7 +18,7 @@ func AddPort(u string, p string) (string, error) {
 	u = TrimURL(u)
 	u = LowerCase(u)
 	if rxSlash.Match([]byte(u)) {
-		u, _ = RemoveTrailingSlash(u)
+		u, _ = StripTrailingSlash(u)
 	}
 	if !rxPort.Match([]byte(u)) {
 		return u + ":" + p, nil
@@ -93,7 +26,11 @@ func AddPort(u string, p string) (string, error) {
 	return "", errors.New("Port already exist")
 }
 
-// add a default protocol
+// AddProtocol attaches the specified Protocol to the URL
+// Accepts URL and Protocol as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string with protocol and nil
+// In case of error return is empty string with a customized error
 func AddProtocol(u string, p string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -106,7 +43,11 @@ func AddProtocol(u string, p string) (string, error) {
 	return "", errors.New("Protocol already Exists")
 }
 
-// to add ending slash
+// AddTrailingSlash attaches the / to the end of URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string and nil
+// In case of error return is empty string with a customized error
 func AddTrailingSlash(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -119,7 +60,11 @@ func AddTrailingSlash(u string) (string, error) {
 	return "", errors.New("TrailingSlash Exist in URL")
 }
 
-// to add tail dot
+// AddTrailingDot attaches the dot (.) to the end of URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string and nil
+// In case of error return is empty string with a customized error
 func AddTrailingDot(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -127,12 +72,16 @@ func AddTrailingDot(u string) (string, error) {
 	u = TrimURL(u)
 	u = LowerCase(u)
 	if rxSlash.Match([]byte(u)) {
-		u, _ = RemoveTrailingSlash(u)
+		u, _ = StripTrailingSlash(u)
 	}
 	return u + ".", nil
 }
 
-// add a default protocol
+// DefaultProtocol attaches the http:// to the URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string and nil
+// In case of error return is empty string with a customized error
 func DefaultProtocol(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -145,7 +94,11 @@ func DefaultProtocol(u string) (string, error) {
 	return "", errors.New("Protocol already Exists")
 }
 
-// convert url http
+// ForceHttp converts the URL from https to http
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string and nil
+// In case of error return is empty string with a customized error
 func ForceHttp(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -159,7 +112,11 @@ func ForceHttp(u string) (string, error) {
 	return "", errors.New("Protocol does not exist")
 }
 
-// convert url to https
+// ForceHttps converts the URL from http to https
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string and nil
+// In case of error return is empty string with a customized error
 func ForceHttps(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -173,22 +130,39 @@ func ForceHttps(u string) (string, error) {
 	return "", errors.New("Protocol does not exist")
 }
 
-// to check URL is  Valid
+// IsValid checks if URL is in format with the URL Pattern
+// IsValid is used by every function in the library
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns true, else false
 func IsValid(u string) bool {
 	return rxC.Match([]byte(u))
 }
 
+// IsEmpty checks URL is empty or not
+// IsEmpty is used by every function in the library
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns true, else false
 func IsEmpty(u string) bool {
 	u = strings.TrimSpace(u)
 	return len(u) == 0
 }
 
+// LowerCase checks if the passed URL is in lowercase
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// it returns the lowercase string
 func LowerCase(u string) string {
 	return strings.ToLower(u)
 }
 
-// to remove ending slash
-func RemoveTrailingSlash(u string) (string, error) {
+// StripTrailingSlash removes TrailingSlash / from the end of URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
+func StripTrailingSlash(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
 	}
@@ -200,8 +174,12 @@ func RemoveTrailingSlash(u string) (string, error) {
 	return "", errors.New("No TrailingSlash Exist")
 }
 
-// to remove tail dot
-func RemoveTrailingDot(u string) (string, error) {
+// StripTrailingDot removes the dot (.) from the end of URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
+func StripTrailingDot(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
 	}
@@ -213,7 +191,12 @@ func RemoveTrailingDot(u string) (string, error) {
 	return "", errors.New("TrailingDot does not exist")
 }
 
-// Protocol used for getting the Protocol of the URL
+// Scheme presents us with the scheme or portocol of the URL
+// internally Scheme uses url.Parse and scheme functions from url package
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
 func Scheme(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -225,7 +208,11 @@ func Scheme(u string) (string, error) {
 	return urlTemp.Scheme, nil
 }
 
-// to remove http or https or //
+// StripProtocol removes the protocol from URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
 func StripProtocol(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -239,7 +226,11 @@ func StripProtocol(u string) (string, error) {
 	return "", errors.New("No Protocol Exist")
 }
 
-// to remove www from URL, NOT WORKING
+// StripWWW removes the www. from URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
 func StripWWW(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -253,7 +244,11 @@ func StripWWW(u string) (string, error) {
 	return "", errors.New("www does not exist")
 }
 
-// strip # from url
+// StripHash removes the # and contents after #example from URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
 func StripHash(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -267,7 +262,11 @@ func StripHash(u string) (string, error) {
 	return "", errors.New("Hash does not exist")
 }
 
-// strip #:~:text=hello from url
+// StripTextFragment removes text fragments from the end of URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
 func StripTextFragment(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -281,7 +280,13 @@ func StripTextFragment(u string) (string, error) {
 	return "", errors.New("Text Fragment does not exist")
 }
 
-//strip authentication part of a url
+// StripAuthentication removes authentication from the end of URL
+// Expected input format
+// "user:password@@example.com", "https://user:password@@example.com"
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// Returns the modified string and nil
+// In case of error return is empty string with a customized error
 func StripAuthentication(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -298,6 +303,11 @@ func StripAuthentication(u string) (string, error) {
 	return "", errors.New("Authentication does not exist")
 }
 
+// StripPort detaches the port from URL
+// Accepts URL as a string argument
+// if string matches the patterns (pattern is regular expression) then
+// returns the modified string with port number and nil
+// In case of error return is empty string with a customized error
 func StripPort(u string) (string, error) {
 	if !IsValid(u) && !IsEmpty(u) {
 		return "", errors.New("Not a vaild URL")
@@ -311,6 +321,9 @@ func StripPort(u string) (string, error) {
 	return "", errors.New("Port Does not exist")
 }
 
+// TrimURL checks if the passed string URL have any spaces to left or right side
+// Accepts URL as a string argument
+// returns modified string
 func TrimURL(u string) string {
 	u = strings.TrimSpace(u)
 	return u
